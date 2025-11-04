@@ -1,11 +1,16 @@
-const express = require('express');
-const app = express();
+const http = require("http");
 const PORT = process.env.PORT || 3000;
 
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+const server = http.createServer((req, res) => {
+  if (req.url === "/health" && req.method === "GET") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok" }));
+  } else {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not Found");
+  }
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
