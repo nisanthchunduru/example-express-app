@@ -1,8 +1,9 @@
-const http = require("http");
+const express = require("express");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, GetCommand } = require("@aws-sdk/lib-dynamodb");
 
 const PORT = process.env.PORT || 3000;
+
 const TABLE_NAME = "example-express-app-table";
 
 const client = new DynamoDBClient({});
@@ -30,32 +31,22 @@ async function getHealthStatus() {
   return item.status;
 }
 
-const server = http.createServer(async (req, res) => {
-  if (req.url === "/health" && req.method === "GET") {
-    try {
-      const status = await getHealthStatus();
+const app = express();
 
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify({
-          status: status,
-        })
-      );
-    } catch (error) {
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify({
-          status: "error",
-          message: error.message,
-        })
-      );
-    }
-  } else {
-    res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("Not Found");
+app.get("/health", async (req, res) => {
+  try {
+    const status = await getHealthStatus();
+    res.json({ status });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      error: {
+        message: e.message,
+      },
+    });
   }
 });
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
