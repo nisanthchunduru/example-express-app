@@ -18,6 +18,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"Not Found")
 
 if __name__ == "__main__":
-    server = HTTPServer(("localhost", PORT), RequestHandler)
-    print(f"Server is running on http://localhost:{PORT}")
+    server = HTTPServer(("0.0.0.0", PORT), RequestHandler)
+    print(f"Server is listening on 0.0.0.0:{PORT}")
     server.serve_forever()
